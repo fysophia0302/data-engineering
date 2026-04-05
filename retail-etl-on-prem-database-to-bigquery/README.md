@@ -1,4 +1,4 @@
-# Sales ETL Pipeline — Teradata to BigQuery
+# Sales ETL Pipeline — Local Database to BigQuery
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue)
 ![Teradata](https://img.shields.io/badge/Teradata-SQL-orange)
