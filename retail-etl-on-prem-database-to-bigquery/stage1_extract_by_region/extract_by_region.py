@@ -1,7 +1,7 @@
 """
 extract_by_region.py
 ====================
-Pulls retail sales data out of Teradata region by region,
+Pulls order transaction data out of Teradata region by region,
 writes each chunk to Parquet, pushes to GCS, then loads the
 whole thing into BigQuery in one shot.
 
@@ -10,6 +10,7 @@ Usage:
     python extract_by_region.py
 """
 
+import json
 import logging
 import os
 import re
@@ -25,21 +26,19 @@ log = logging.getLogger(__name__)
 
 # pull from env — nothing sensitive in code
 GCP_PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
-BQ_DATASET     = os.environ.get("BQ_DATASET", "retail_etl_dev")
+BQ_DATASET     = os.environ.get("BQ_DATASET", "sales_etl_dev")
 TD_SECRET_ID   = os.environ.get("TD_SECRET_ID", "teradata-credential-secret")
-GCS_BUCKET     = os.environ.get("GCS_BUCKET", "retail-etl-dev")
+GCS_BUCKET     = os.environ.get("GCS_BUCKET", "sales-etl-dev")
 TMP_DIR        = r"tmp/stage1"
-GCS_PATH       = "retail_etl_output"
-BQ_TABLE       = "retail_sales_stage1"
+GCS_PATH       = "order_txn_output"
+BQ_TABLE       = "order_transactions_stage1"
 
 REGIONS = ['R01', 'R02', 'R03', 'R04', 'R05', 'R06', 'R07', 'R08', 'R09', 'R10', 'R11', 'R12']
 
 
 def get_td_secret() -> dict:
     """Fetch Teradata credentials from Secret Manager at runtime."""
-    from google.cloud import secretmanager as sm
-    import json
-    client = sm.SecretManagerServiceClient()
+    client = secretmanager.SecretManagerServiceClient()
     name = f"projects/{GCP_PROJECT_ID}/secrets/{TD_SECRET_ID}/versions/latest"
     response = client.access_secret_version(request={"name": name})
     return json.loads(response.payload.data.decode("UTF-8"))
@@ -65,7 +64,7 @@ CLEANED_PARQUET_SCHEMA = pa.schema(cleaned_fields)
 def process_region(args) -> int | None:
     """
     Worker function — one region per process.
-    Runs all DDL to build volatile tables, fires the DML,
+    Runs DDL to build volatile tables, fires the DML,
     streams results into a local Parquet file, then uploads to GCS.
     Returns the row count, or None if something went wrong.
     """
@@ -135,7 +134,7 @@ def upload_to_gcs(local_file: str, bucket_name: str, gcs_path: str):
 
 def load_gcs_to_bq():
     """
-    Load all the regional Parquet files from GCS into a single BigQuery table.
+    Load all regional Parquet files from GCS into a single BigQuery table.
     Uses WRITE_TRUNCATE so each run replaces the previous data.
     """
     client   = bigquery.Client()

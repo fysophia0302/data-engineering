@@ -1,14 +1,14 @@
 """
 main.py
 =======
-Orchestrates the full retail ETL pipeline.
+Orchestrates the full sales ETL pipeline.
 
-Phase 1 — extract_by_region:
-    Pulls sales data from Teradata in parallel by region,
+Stage 1 — extract_by_region:
+    Pulls order transaction data from Teradata in parallel by region,
     writes Parquet to GCS, loads into BigQuery.
 
-Phase 2 — product_flag_etl:
-    Pulls product classification flags from Teradata,
+Stage 2 — product_flag_etl:
+    Pulls a product catalogue snapshot from Teradata,
     uploads to GCS, loads into BigQuery.
 
 Usage:
@@ -30,13 +30,13 @@ log = logging.getLogger(__name__)
 def main():
     log.info("=== ETL pipeline starting ===")
 
-    log.info("--- Phase 1: regional sales extraction ---")
+    log.info("--- Stage 1: regional order extraction ---")
     run_extract_by_region()
-    log.info("--- Phase 1 complete ---")
+    log.info("--- Stage 1 complete ---")
 
-    log.info("--- Phase 2: product flag extraction ---")
+    log.info("--- Stage 2: product catalogue extraction ---")
     run_product_flag_etl()
-    log.info("--- Phase 2 complete ---")
+    log.info("--- Stage 2 complete ---")
 
     log.info("=== ETL pipeline done ===")
 

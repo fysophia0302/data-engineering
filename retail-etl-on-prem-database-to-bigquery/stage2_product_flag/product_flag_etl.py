@@ -1,7 +1,7 @@
 """
 product_flag_etl.py
 ===================
-Pulls a product classification table from Teradata,
+Pulls a product catalogue snapshot from Teradata,
 writes it to Parquet, uploads to GCS, then loads into BigQuery.
 
 This is a one-shot load — runs once per refresh cycle and
@@ -22,13 +22,13 @@ log = logging.getLogger(__name__)
 
 # pull from env — nothing sensitive in code
 GCP_PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
-GCS_BUCKET     = os.environ.get("GCS_BUCKET", "retail-etl-dev")
-BQ_DATASET     = os.environ.get("BQ_DATASET", "retail_etl_dev")
+GCS_BUCKET     = os.environ.get("GCS_BUCKET", "sales-etl-dev")
+BQ_DATASET     = os.environ.get("BQ_DATASET", "sales_etl_dev")
 TD_SECRET_ID   = os.environ.get("TD_SECRET_ID", "teradata-credential-secret")
-TMP_DIR        = r"tmp/product_flag"
-GCS_PATH       = "product_flag"
-BQ_TABLE       = "product_flag"
-PARQUET_NAME   = "product_flag.parquet"
+TMP_DIR        = r"tmp/product_catalogue"
+GCS_PATH       = "product_catalogue"
+BQ_TABLE       = "product_catalogue"
+PARQUET_NAME   = "product_catalogue.parquet"
 
 
 def get_td_secret() -> dict:
@@ -39,33 +39,30 @@ def get_td_secret() -> dict:
     return json.loads(response.payload.data.decode("UTF-8"))
 
 
-# query is generalized — real table names omitted
 QUERY = """
 SELECT
     p.product_id,
+    p.sku_cd,
     p.product_desc,
-    h.category_0_cd,
-    h.category_0_desc,
-    h.subcategory_cd,
-    h.subcategory_desc,
-    p.net_weight_qty,
-    'Y' AS flag_ind
+    p.category_cd,
+    p.subcategory_cd,
+    p.brand_cd,
+    p.unit_weight,
+    p.active_flag
 FROM source_db.product_master p
-INNER JOIN source_db.product_hierarchy h
-    ON p.product_id = h.product_id
-WHERE p.brand_type_cd = '1'
-  AND h.category_0_cd IN ('CAT001', 'CAT002', 'CAT003')
+WHERE p.active_flag = 'Y'
+  AND p.category_cd IN ('CAT001', 'CAT002', 'CAT003')
 """
 
 SCHEMA = pa.schema([
-    ("product_id",       pa.string()),
-    ("product_desc",     pa.string()),
-    ("category_0_cd",    pa.string()),
-    ("category_0_desc",  pa.string()),
-    ("subcategory_cd",   pa.string()),
-    ("subcategory_desc", pa.string()),
-    ("net_weight_qty",   pa.decimal128(17, 3)),
-    ("flag_ind",         pa.string()),
+    ("product_id",     pa.string()),
+    ("sku_cd",         pa.string()),
+    ("product_desc",   pa.string()),
+    ("category_cd",    pa.string()),
+    ("subcategory_cd", pa.string()),
+    ("brand_cd",       pa.string()),
+    ("unit_weight",    pa.decimal128(17, 3)),
+    ("active_flag",    pa.string()),
 ])
 
 
@@ -156,10 +153,10 @@ def load_gcs_to_bq(gcs_uri: str, table_id: str, write_mode: str = "WRITE_TRUNCAT
 
 
 def run_product_flag_etl():
-    """Entry point — extract from Teradata, upload to GCS, load into BigQuery."""
-    full_table_id  = f"{GCP_PROJECT_ID}.{BQ_DATASET}.{BQ_TABLE}"
-    gcs_blob_path  = f"{GCS_PATH}/{PARQUET_NAME}"
-    gcs_uri        = f"gs://{GCS_BUCKET}/{gcs_blob_path}"
+    """Entry point — extract product catalogue from Teradata, upload to GCS, load into BigQuery."""
+    full_table_id = f"{GCP_PROJECT_ID}.{BQ_DATASET}.{BQ_TABLE}"
+    gcs_blob_path = f"{GCS_PATH}/{PARQUET_NAME}"
+    gcs_uri       = f"gs://{GCS_BUCKET}/{gcs_blob_path}"
 
     row_count = extract_td_to_gcs_parquet(QUERY, GCS_BUCKET, gcs_blob_path)
 
