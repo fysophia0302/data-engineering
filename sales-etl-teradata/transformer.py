@@ -45,33 +45,33 @@ def coerce_types(df: pd.DataFrame) -> pd.DataFrame:
     def empty_to_null(col):
         return col.replace(r'^\s*$', np.nan, regex=True)
 
-    # Nullable string columns
+    # nullable string columns
     df['SIZE_UOM_CD']       = empty_to_null(df['SIZE_UOM_CD'])
     df['SHIP_INNER_UOM_CD'] = empty_to_null(df['SHIP_INNER_UOM_CD'])
 
-    # Decimal columns
-    for col in ['SHIP_GROSS_WT', 'SHIP_NET_WT', 'SHIP_QTY', 'SHIP_SL_AMT']:
+    # decimal columns
+    for col in ['SHIP_GROSS_WT', 'SHIP_NET_WT', 'ORDER_QTY', 'ORDER_AMT']:
         df[col] = clean_decimal(df[col])
 
-    # Integer columns
+    # integer columns
     for col in ['SIZE_UOM_QTY', 'SHIP_INNER_QTY']:
         df[col] = clean_int(df[col])
 
-    # String columns — strip whitespace and sentinel strings
+    # string columns — strip whitespace and sentinel strings
     string_cols = [
-        "CORP_YR_NUM", "CORP_PD_NUM", "CO_CD", "INPUT_SRC",
-        "DIST_VEND_NUM", "DIST_VEND_NM", "VEND_MFG_NUM", "VEND_MFG_NM",
-        "VEND_MFG_ITEM_NUM", "DIST_ITEM_NUM", "LCL_ARTCL_NUM",
-        "RTL_UPC_CD", "ARTCL_MED_DESC", "SITE_NUM", "BAN_NUM", "RGN_NUM",
-        "SITE_PROV_CD", "WGT_UOM_CD", "SHIP_UOM_CD", "SHIP_UOM_DESC",
-        "SHIP_INNER_UOM_CD", "SIZE_UOM_CD",
+        "ORDER_YR", "ORDER_MTH", "CO_CD", "INPUT_SRC",
+        "SELLER_ID", "SELLER_NM", "BRAND_ID", "BRAND_NM",
+        "BRAND_ITEM_NUM", "DIST_ITEM_NUM", "PRODUCT_NUM",
+        "SKU_CD", "ITEM_DESC", "WAREHOUSE_ID", "CHANNEL_CD",
+        "COUNTRY_CD", "STATE_CD", "WGT_UOM_CD", "SHIP_UOM_CD",
+        "SHIP_UOM_DESC", "SHIP_INNER_UOM_CD", "SIZE_UOM_CD",
     ]
     for col in string_cols:
         df[col] = df[col].astype(str).str.strip().replace(['nan', 'None', 'NULL'], '')
 
-    # Normalise vendor name and description
-    df["VEND_MFG_NM"]    = df["VEND_MFG_NM"].str.strip().str.title()
-    df["ARTCL_MED_DESC"] = df["ARTCL_MED_DESC"].str.strip()
+    # normalise seller name and item description
+    df["SELLER_NM"] = df["SELLER_NM"].str.strip().str.title()
+    df["ITEM_DESC"]  = df["ITEM_DESC"].str.strip()
 
     return df
 

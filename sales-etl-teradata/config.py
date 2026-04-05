@@ -1,7 +1,7 @@
 """
 config.py
 =========
-Centralised configuration for the Sales ETL pipeline.
+Centralised configuration for the e-commerce order ETL pipeline.
 All environment-specific values are read from environment variables
 or set here as constants — never hard-coded credentials.
 """
@@ -18,7 +18,7 @@ TD_HOST     = os.environ.get("TD_HOST", "your-teradata-host")
 # ============================================================
 # File Config
 # ============================================================
-FILE_NAME    = "SAMPLE_SALE_DATA.csv"
+FILE_NAME    = "SAMPLE_ORDER_DATA.csv"
 RECEIVED_DIR = r"C:\data\etl_pipeline\input"
 
 # ============================================================
@@ -45,53 +45,53 @@ BATCH_SIZE = 1000
 # Column Mapping
 # ============================================================
 COLUMN_MAP = {
-    "CORP_YR_NUM"         : "CORP_YR_NUM",
-    "CORP_PD_NUM"         : "CORP_PD_NUM",
-    "SRC"                 : "INPUT_SRC",
-    "CO_CD"               : "CO_CD",
-    "DIST_VEND_NUM"       : "DIST_VEND_NUM",
-    "DIST_VEND_NM"        : "DIST_VEND_NM",
-    "VEND_MFG_NUM"        : "VEND_MFG_NUM",
-    "VEND_MFG_NM"         : "VEND_MFG_NM",
-    "VEND_MFG_ITEM_NUMBER": "VEND_MFG_ITEM_NUM",
-    "DIST_ITEM_NUMBER"    : "DIST_ITEM_NUM",
-    "LCL_ARTCL_NUM"       : "LCL_ARTCL_NUM",
-    "UPC"                 : "RTL_UPC_CD",
-    "ARTCL_CAT"           : "ARTCL_CAT",
-    "PRODUCT_DESC"        : "ARTCL_MED_DESC",
-    "SITE"                : "SITE_NUM",
-    "SHIP_BANNER"         : "BAN_NUM",
-    "SHIP_REGION"         : "RGN_NUM",
-    "SHIP_PROV"           : "SITE_PROV_CD",
-    "WT_UOM"              : "WGT_UOM_CD",
-    "SHIP_UOM"            : "SHIP_UOM_CD",
-    "SHIP_UOM_DESC"       : "SHIP_UOM_DESC",
-    "SHIP_INNER_UOM"      : "SHIP_INNER_UOM_CD",
-    "GROSS_WT_SHIP_UOM"   : "SHIP_GROSS_WT",
-    "NET_WT_SHIP_UOM"     : "SHIP_NET_WT",
-    "SHIP_INNER_QTY"      : "SHIP_INNER_QTY",
-    "SIZE_NUM_QTY"        : "SIZE_UOM_QTY",
-    "SIZE_UOM"            : "SIZE_UOM_CD",
-    "SHIP_QTY"            : "SHIP_QTY",
-    "SHIP_SL_AMT"         : "SHIP_SL_AMT",
+    "ORDER_YR"           : "ORDER_YR",
+    "ORDER_MTH"          : "ORDER_MTH",
+    "SRC"                : "INPUT_SRC",
+    "CO_CD"              : "CO_CD",
+    "SELLER_ID"          : "SELLER_ID",
+    "SELLER_NM"          : "SELLER_NM",
+    "BRAND_ID"           : "BRAND_ID",
+    "BRAND_NM"           : "BRAND_NM",
+    "BRAND_ITEM_NUMBER"  : "BRAND_ITEM_NUM",
+    "DIST_ITEM_NUMBER"   : "DIST_ITEM_NUM",
+    "PRODUCT_NUM"        : "PRODUCT_NUM",
+    "SKU_CD"             : "SKU_CD",
+    "PRODUCT_CAT"        : "PRODUCT_CAT",
+    "ITEM_DESC"          : "ITEM_DESC",
+    "WAREHOUSE_ID"       : "WAREHOUSE_ID",
+    "CHANNEL_CD"         : "CHANNEL_CD",
+    "COUNTRY_CD"         : "COUNTRY_CD",
+    "STATE_CD"           : "STATE_CD",
+    "WT_UOM"             : "WGT_UOM_CD",
+    "SHIP_UOM"           : "SHIP_UOM_CD",
+    "SHIP_UOM_DESC"      : "SHIP_UOM_DESC",
+    "SHIP_INNER_UOM"     : "SHIP_INNER_UOM_CD",
+    "GROSS_WT"           : "SHIP_GROSS_WT",
+    "NET_WT"             : "SHIP_NET_WT",
+    "SHIP_INNER_QTY"     : "SHIP_INNER_QTY",
+    "SIZE_NUM_QTY"       : "SIZE_UOM_QTY",
+    "SIZE_UOM"           : "SIZE_UOM_CD",
+    "ORDER_QTY"          : "ORDER_QTY",
+    "ORDER_AMT"          : "ORDER_AMT",
 }
 
 TABLE_COLUMNS = [
-    "CORP_YR_NUM", "CORP_PD_NUM", "CO_CD", "INPUT_SRC",
-    "DIST_VEND_NUM", "DIST_VEND_NM", "VEND_MFG_NUM", "VEND_MFG_NM",
-    "VEND_MFG_ITEM_NUM", "DIST_ITEM_NUM", "LCL_ARTCL_NUM", "RTL_UPC_CD",
-    "ARTCL_MED_DESC", "SITE_NUM", "BAN_NUM", "RGN_NUM", "SITE_PROV_CD",
+    "ORDER_YR", "ORDER_MTH", "CO_CD", "INPUT_SRC",
+    "SELLER_ID", "SELLER_NM", "BRAND_ID", "BRAND_NM",
+    "BRAND_ITEM_NUM", "DIST_ITEM_NUM", "PRODUCT_NUM", "SKU_CD",
+    "ITEM_DESC", "WAREHOUSE_ID", "CHANNEL_CD", "COUNTRY_CD", "STATE_CD",
     "WGT_UOM_CD", "SHIP_UOM_CD", "SHIP_UOM_DESC", "SHIP_INNER_UOM_CD",
     "SHIP_GROSS_WT", "SHIP_NET_WT", "SHIP_INNER_QTY", "SIZE_UOM_CD",
-    "SIZE_UOM_QTY", "SHIP_QTY", "SHIP_SL_AMT", "FILE_LOAD_DT",
+    "SIZE_UOM_QTY", "ORDER_QTY", "ORDER_AMT", "FILE_LOAD_DT",
 ]
 
 MAX_LEN = {
-    "CO_CD": 3, "INPUT_SRC": 20, "DIST_VEND_NUM": 10,
-    "DIST_VEND_NM": 40, "VEND_MFG_NUM": 40, "VEND_MFG_NM": 40,
-    "VEND_MFG_ITEM_NUM": 40, "DIST_ITEM_NUM": 40, "LCL_ARTCL_NUM": 18,
-    "RTL_UPC_CD": 40, "ARTCL_MED_DESC": 60, "SITE_NUM": 4,
-    "BAN_NUM": 3, "RGN_NUM": 4, "SITE_PROV_CD": 2, "WGT_UOM_CD": 5,
+    "CO_CD": 3, "INPUT_SRC": 20, "SELLER_ID": 10,
+    "SELLER_NM": 40, "BRAND_ID": 40, "BRAND_NM": 40,
+    "BRAND_ITEM_NUM": 40, "DIST_ITEM_NUM": 40, "PRODUCT_NUM": 18,
+    "SKU_CD": 40, "ITEM_DESC": 60, "WAREHOUSE_ID": 4,
+    "CHANNEL_CD": 3, "COUNTRY_CD": 4, "STATE_CD": 2, "WGT_UOM_CD": 5,
     "SHIP_UOM_CD": 5, "SHIP_UOM_DESC": 40, "SHIP_INNER_UOM_CD": 5,
     "SIZE_UOM_CD": 5,
 }
