@@ -75,10 +75,10 @@ python main.py
 
 ## Sample Run
 
-6 worker processes running in parallel across 12 regions,
+4 worker processes running in parallel across 12 regions,
 extracting a total of 72M+ rows from Teradata into BigQuery.
 
-![Sample Run](images/Sample Run.PNG)
+![Sample Run](images/sample_run.png)
 
 
 ## Note
